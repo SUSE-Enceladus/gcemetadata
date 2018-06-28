@@ -23,7 +23,7 @@ Release:        0
 Summary:        Collect instance metadata in GCE
 License:        GPL-3.0+
 Group:          System/Management
-Url:            https://github.com/SUSE/Enceladus
+Url:            https://github.com/SUSE-Enceladus/gcemetadata
 Source0:        %{upstream_name}-%{version}.tar.bz2
 Requires:       python3
 BuildRequires:  python3-setuptools
