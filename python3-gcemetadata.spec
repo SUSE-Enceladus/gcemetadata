@@ -1,7 +1,7 @@
 #
-# spec file for package python-gcemetadata
+# spec file for package python3-gcemetadata
 #
-# Copyright (c) 2018 SUSE LINUX Products GmbH, Nuernberg, Germany.
+# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -20,10 +20,10 @@
 Name:           python3-gcemetadata
 Version:        1.0.1
 Release:        0
-Summary:        Collect instance metadata in GCE
-License:        GPL-3.0+
+Summary:        Python module for collecting instance metadata from GCE
+License:        GPL-3.0-or-later
 Group:          System/Management
-Url:            https://github.com/SUSE-Enceladus/gcemetadata
+Url:            https://github.com/SUSE/Enceladus
 Source0:        %{upstream_name}-%{version}.tar.bz2
 Requires:       python3
 BuildRequires:  python3-setuptools
@@ -36,7 +36,7 @@ Provides:       python-gcemetadata = %{version}
 Obsoletes:      python-gcemetadata < %{version}
 
 %description
-Collect instance meta data in Google compute Emgine
+A module for collecting instance metadata from Google Compute Engine.
 
 %prep
 %setup -q -n %{upstream_name}-%{version}
