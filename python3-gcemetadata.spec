@@ -18,7 +18,7 @@
 
 %define upstream_name gcemetadata
 Name:           python3-gcemetadata
-Version:        1.0.1
+Version:        1.0.2
 Release:        0
 Summary:        Collect instance metadata in GCE
 License:        GPL-3.0+

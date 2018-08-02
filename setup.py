@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Setup module for gcemetadata"""
 
-# Copyright (c) 2015 SUSE LLC
+# Copyright (c) 2018 SUSE LLC
 #
 # This file is part of gcemetadata.
 #
