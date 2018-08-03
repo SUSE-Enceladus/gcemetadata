@@ -52,12 +52,12 @@ class GCEMetadata:
         self.server = 'metadata.google.internal'
         self.subnet_id = -1
 
-        if apiv not in self.get_available_api_versions():
-            msg = 'Given API version "%s" not available' % apiv
-            raise GCEMetadataException(msg)
-
         if not self._test_connectivity(self.server, 80):
             msg = 'Could not connect to: %s' % self.server
+            raise GCEMetadataException(msg)
+
+        if apiv not in self.get_available_api_versions():
+            msg = 'Given API version "%s" not available' % apiv
             raise GCEMetadataException(msg)
 
         self._create_options_map()
