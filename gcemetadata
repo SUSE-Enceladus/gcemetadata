@@ -138,6 +138,28 @@ def main():
             if opt in opts_with_args:
                 opt += '='
             command_line_opts.append(opt)
+        # Special case for identity handling
+        # It is possible to have an instance that does not support access to
+        # the guest-attributes information from the metadata server. If this
+        # is the case the logically linked options of "identity-format" and
+        # "identity" cannot be handled properly as the "identity" option gets
+        # removed from the processed command line options. This leads to
+        # "identity-format" having the wrong value and triggering an
+        # incorrect message (Issue #2).
+        # This is the only place in the code where we know about
+        # the connection between the two options.
+        # Raising an error at a lower level would break the best effort
+        # nature of the command. One can still retrieve metadata
+        # on an instance that does not afford access to the guest-attributes
+        if (
+                '--identity-format' in sys.argv[1:] and
+                'identity' not in command_line_opts
+        ):
+            print(
+                'Unable to access instance identity information',
+                ile=sys.stderr
+            )
+            sys.exit(1)
         opts, args = getopt.gnu_getopt(
             sys.argv[1:],
             'hlo:vq:x',
