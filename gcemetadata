@@ -17,13 +17,12 @@ If no options are specified, all will be displayed.
 
 
 import getopt
-import os
 import sys
 
 import gcemetadata.gcemetadata as gcemetadata
 import gcemetadata.gcemetautils as gcemetautils
 
-from gcemetadata.gcemetaExceptions import *
+from gcemetadata.gcemetaExceptions import GCEMetadataException
 
 general_options = ['api', 'help', 'identity-format=', 'listapis', 'output=',
                    'version', 'xml']
@@ -115,13 +114,13 @@ def main():
     if api:
         try:
             meta = gcemetadata.GCEMetadata(api)
-        except gcemetadata.GCEMetadataException as e:
+        except GCEMetadataException as e:
             print(e, file=sys.stderr)
             sys.exit(1)
     else:
         try:
             meta = gcemetadata.GCEMetadata()
-        except gcemetadata.GCEMetadataException as e:
+        except GCEMetadataException as e:
             print(e, file=sys.stderr)
             sys.exit(1)
 
@@ -157,7 +156,7 @@ def main():
         ):
             print(
                 'Unable to access instance identity information',
-                ile=sys.stderr
+                file=sys.stderr
             )
             sys.exit(1)
         opts, args = getopt.gnu_getopt(
@@ -210,7 +209,7 @@ def main():
         elif opt == '--diskid':
             try:
                 meta.set_disk_device(val)
-            except gcemetadata.GCEMetadataException as e:
+            except GCEMetadataException as e:
                 usage(meta.get_api_map(), meta.get_option_categories(), e)
             continue
         elif opt == '--identity':
@@ -229,13 +228,13 @@ def main():
         elif opt == '--licenseid':
             try:
                 meta.set_license_id(val)
-            except gcemetadata.GCEMetadataException as e:
+            except GCEMetadataException as e:
                 usage(meta.get_api_map(), meta.get_option_categories(), e)
             continue
         elif opt == '--netid':
             try:
                 meta.set_net_device(val)
-            except gcemetadata.GCEMetadataException as e:
+            except GCEMetadataException as e:
                 usage(meta.get_api_map(), meta.get_option_categories(), e)
             continue
         elif opt in ('-o', '--output'):
@@ -245,13 +244,13 @@ def main():
             found_query = 1
             try:
                 meta.set_data_category(val)
-            except gcemetadata.GCEMetadataException as e:
+            except GCEMetadataException as e:
                 usage(meta.get_api_map(), meta.get_option_categories(), e)
             continue
         elif opt == '--subnetid':
             try:
                 meta.set_subnet(val)
-            except gcemetadata.GCEMetadataException as e:
+            except GCEMetadataException as e:
                 usage(meta.get_api_map(), meta.get_option_categories(), e)
             continue
         elif opt in ('-v', '--version'):

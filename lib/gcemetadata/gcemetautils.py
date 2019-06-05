@@ -25,7 +25,7 @@ import sys
 from io import IOBase
 
 import gcemetadata
-from gcemetadata.gcemetaExceptions import *
+from gcemetadata.gcemetaExceptions import GCEMetadataException
 
 
 def _clean_up_options(metadata, options):
