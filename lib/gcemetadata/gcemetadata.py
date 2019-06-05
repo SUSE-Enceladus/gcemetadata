@@ -20,7 +20,7 @@ import socket
 import time
 import urllib.request, urllib.error, urllib.parse
 
-from gcemetadata.gcemetaExceptions import *
+from gcemetadata.gcemetaExceptions import GCEMetadataException
 
 
 class GCEMetadata:
