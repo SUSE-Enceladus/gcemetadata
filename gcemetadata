@@ -152,7 +152,7 @@ def main():
         # on an instance that does not afford access to the guest-attributes
         if (
                 '--identity-format' in sys.argv[1:] and
-                'identity' not in command_line_opts
+                'identity=' not in command_line_opts
         ):
             print(
                 'Unable to access instance identity information',
