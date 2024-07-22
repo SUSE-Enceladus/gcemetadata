@@ -1,7 +1,7 @@
 #
 # spec file for package python3-gcemetadata
 #
-# Copyright (c) 2018 SUSE LINUX GmbH, Nuernberg, Germany.
+# Copyright (c) 2025 SUSE LLC
 #
 # All modifications and additions to the file contributed by third parties
 # remain the property of their copyright owners, unless otherwise agreed
@@ -12,52 +12,58 @@
 # license that conforms to the Open Source Definition (Version 1.9)
 # published by the Open Source Initiative.
 
-# Please submit bugfixes or comments via http://bugs.opensuse.org/
+# Please submit bugfixes or comments via https://bugs.opensuse.org/
 #
 
 
+%if 0%{?suse_version} >= 1600
+%define pythons %{primary_python}
+%else
+%define pythons python311
+%endif
+%global _sitelibdir %{%{pythons}_sitelib}
+
 %define upstream_name gcemetadata
-Name:           python3-gcemetadata
+Name:           python-gcemetadata
 Version:        1.0.4
 Release:        0
 Summary:        Python module for collecting instance metadata from GCE
 License:        GPL-3.0-or-later
 Group:          System/Management
-Url:            https://github.com/SUSE/Enceladus
+URL:            https://github.com/SUSE/Enceladus
 Source0:        %{upstream_name}-%{version}.tar.bz2
-Requires:       python3
-BuildRequires:  python3-setuptools
-BuildRoot:      %{_tmppath}/%{name}-%{version}-build
+Requires:       python
+BuildRequires:  %{pythons}-setuptools
+BuildRequires:  %{pythons}-pip
+BuildRequires:  %{pythons}-wheel
+BuildRequires:  python-rpm-macros
+BuildRequires:  fdupes
+Obsoletes:      python3-gcemetadata < %{version}
 BuildArch:      noarch
-
-# Package renamed in SLE 12, do not remove Provides, Obsolete directives
-# until after SLE 12 EOL
-Provides:       python-gcemetadata = %{version}
-Obsoletes:      python-gcemetadata < %{version}
 
 %description
 A module for collecting instance metadata from Google Compute Engine.
 
 %prep
-%setup -q -n %{upstream_name}-%{version}
+%autosetup -p1 -n %{upstream_name}-%{version}
+
 
 %build
-python3 setup.py build
+%pyproject_wheel
+
 
 %install
-python3 setup.py install --prefix=%{_prefix} --root=%{buildroot}
+%pyproject_install
 install -d -m 755 %{buildroot}/%{_mandir}/man1
 install -m 644 man/man1/gcemetadata.1 %{buildroot}/%{_mandir}/man1
-gzip %{buildroot}/%{_mandir}/man1/gcemetadata.1
+%fdupes %{buildroot}%{$python_sitelib}
 
 %files
-%defattr(-,root,root,-)
 %doc README.md
 %license LICENSE
-%{_mandir}/man*/*
-%dir %{python3_sitelib}/%{upstream_name}
-%dir %{python3_sitelib}/%{upstream_name}-%{version}-py%{py3_ver}.egg-info
-%{_bindir}/*
-%{python3_sitelib}/*
+%{_bindir}/%{upstream_name}
+%{python_sitelib}/%{upstream_name}
+%{python_sitelib}/%{upstream_name}-%{version}*-info
+%{_mandir}/man1/%{upstream_name}.1%{?ext_man}
 
 %changelog
