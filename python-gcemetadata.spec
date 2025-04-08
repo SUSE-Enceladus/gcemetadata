@@ -19,7 +19,7 @@
 %if 0%{?suse_version} >= 1600
 %define pythons %{primary_python}
 %else
-%define pythons python311
+%{?sle15_python_module_pythons}
 %endif
 %global _sitelibdir %{%{pythons}_sitelib}
 
