@@ -32,13 +32,16 @@ License:        GPL-3.0-or-later
 Group:          System/Management
 URL:            https://github.com/SUSE/Enceladus
 Source0:        %{upstream_name}-%{version}.tar.bz2
-Requires:       python
 BuildRequires:  %{pythons}-setuptools
 BuildRequires:  %{pythons}-pip
 BuildRequires:  %{pythons}-wheel
 BuildRequires:  python-rpm-macros
 BuildRequires:  fdupes
 Obsoletes:      python3-gcemetadata < %{version}
+Obsoletes:      python310-gcemetadata < %{version}
+Obsoletes:      python311-gcemetadata < %{version}
+Obsoletes:      python312-gcemetadata < %{version}
+Obsoletes:      python313-gcemetadata < %{version}
 BuildArch:      noarch
 
 %description
@@ -56,14 +59,14 @@ A module for collecting instance metadata from Google Compute Engine.
 %pyproject_install
 install -d -m 755 %{buildroot}/%{_mandir}/man1
 install -m 644 man/man1/gcemetadata.1 %{buildroot}/%{_mandir}/man1
-%fdupes %{buildroot}%{$python_sitelib}
+%fdupes %{buildroot}%{_sitelibdir}
 
 %files
 %doc README.md
 %license LICENSE
 %{_bindir}/%{upstream_name}
-%{python_sitelib}/%{upstream_name}
-%{python_sitelib}/%{upstream_name}-%{version}*-info
+%{_sitelibdir}/%{upstream_name}
+%{_sitelibdir}/%{upstream_name}-%{version}*-info
 %{_mandir}/man1/%{upstream_name}.1%{?ext_man}
 
 %changelog
