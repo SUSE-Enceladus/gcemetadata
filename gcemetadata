@@ -24,8 +24,16 @@ import gcemetadata.gcemetautils as gcemetautils
 
 from gcemetadata.gcemetaExceptions import GCEMetadataException
 
-general_options = ['api', 'help', 'identity-format=', 'listapis', 'output=',
-                   'version', 'xml']
+general_options = [
+    'api',
+    'help',
+    'identity-format=',
+    'identity-licenses=',
+    'listapis',
+    'output=',
+    'version',
+    'xml'
+]
 opts_with_args = ['identity']
 opts_with_id_targets = ['disks', 'licenses', 'network-interfaces']
 
@@ -151,8 +159,9 @@ def main():
         # nature of the command. One can still retrieve metadata
         # on an instance that does not afford access to the guest-attributes
         if (
-                '--identity-format' in sys.argv[1:] and
-                'identity=' not in command_line_opts
+            ('--identity-format' in sys.argv[1:] or
+             '--identity-licenses' in sys.argv[1:]) and
+            'identity=' not in command_line_opts
         ):
             print(
                 'Unable to access instance identity information',
@@ -224,6 +233,14 @@ def main():
                 print(msg % supported_vals, file=sys.stderr)
                 sys.exit(1)
             meta.set_identity_format(val)
+            continue
+        elif opt == '--identity-licenses':
+            supported_vals = ['TRUE', 'FALSE']
+            if val not in supported_vals:
+                msg = '--identity-licenses possible values: "%s"'
+                print(msg % supported_vals, file=sys.stderr)
+                sys.exit(1)
+            meta.set_identity_licenses(val)
             continue
         elif opt == '--licenseid':
             try:
