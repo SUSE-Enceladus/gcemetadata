@@ -41,6 +41,7 @@ class GCEMetadata:
         self.header = {'Metadata-Flavor': 'Google'}
         self.identity_arg = None
         self.identity_format = 'standard'
+        self.identity_licenses = 'FALSE'
         self.license_data_shown = []
         self.license_id = -1
         self.net_data_shown = []
@@ -77,8 +78,10 @@ class GCEMetadata:
     def _add_arguments(self, option):
         """Add an argument to the uri"""
         arg_map = {
-            'identity': 'audience=%s&format=%s' % (
-                self.identity_arg, self.identity_format
+            'identity': 'audience=%s&format=%s&licenses=%s' % (
+                self.identity_arg,
+                self.identity_format,
+                self.identity_licenses
             )
         }
         if option in arg_map.keys():
@@ -363,6 +366,10 @@ class GCEMetadata:
     def set_identity_format(self, id_format):
         """Set the format for the identity token, full or standard"""
         self.identity_format = id_format
+
+    def set_identity_licenses(self, id_licenses):
+        """Set the licenses value, TRUE or FALSE"""
+        self.identity_licenses = id_licenses
 
     def set_license_id(self, license_id):
         """Set the id for the license to query"""
