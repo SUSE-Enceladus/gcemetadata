@@ -189,6 +189,7 @@ def main():
             return
     elif len(opts) == 2:
         found_xml = None
+        outfile = None
         for opt, val in opts:
             if opt in ['-o', '--output']:
                 outfile = val
