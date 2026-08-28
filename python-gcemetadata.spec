@@ -25,18 +25,18 @@
 
 %define upstream_name gcemetadata
 Name:           python-gcemetadata
-Version:        1.1.1
+Version:        1.1.2
 Release:        0
 Summary:        Python module for collecting instance metadata from GCE
 License:        GPL-3.0-or-later
 Group:          System/Management
 URL:            https://github.com/SUSE/Enceladus
 Source0:        %{upstream_name}-%{version}.tar.bz2
-BuildRequires:  %{pythons}-setuptools
 BuildRequires:  %{pythons}-pip
+BuildRequires:  %{pythons}-setuptools
 BuildRequires:  %{pythons}-wheel
-BuildRequires:  python-rpm-macros
 BuildRequires:  fdupes
+BuildRequires:  python-rpm-macros
 Obsoletes:      python3-gcemetadata < %{version}
 Obsoletes:      python310-gcemetadata < %{version}
 Obsoletes:      python311-gcemetadata < %{version}
@@ -50,10 +50,8 @@ A module for collecting instance metadata from Google Compute Engine.
 %prep
 %autosetup -p1 -n %{upstream_name}-%{version}
 
-
 %build
 %pyproject_wheel
-
 
 %install
 %pyproject_install

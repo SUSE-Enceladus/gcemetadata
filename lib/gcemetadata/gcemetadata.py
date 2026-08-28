@@ -16,6 +16,7 @@
 # along with gcemetadata.  If not, see <http://www.gnu.org/licenses/>.
 
 import os
+import selectors
 import socket
 import time
 import urllib.request, urllib.error, urllib.parse
@@ -53,8 +54,8 @@ class GCEMetadata:
         self.server = 'metadata.google.internal'
         self.subnet_id = -1
 
-        if not self._test_connectivity(self.server, 80):
-            msg = 'Could not connect to: %s' % self.server
+        if not self._test_connectivity(80):
+            msg = 'Could not connect to: metadata.google.internal'
             raise GCEMetadataException(msg)
 
         if apiv not in self.get_available_api_versions():
@@ -63,17 +64,84 @@ class GCEMetadata:
 
         self._create_options_map()
 
-    def _test_connectivity(self, addr, port):
-        for i in range(6):
-            s = socket.socket()
-            try:
-                s.connect((addr, port))
-                s.close()
+    def _test_connectivity(self, port):
+        # In a dual stack setting a request to the DNS name takes forever
+        # measured >40 seconds. We do not want to wait this long. Use the
+        # IP addresses for the metadata server.
+        for i in range(4):
+            server = self._connect_first_responder(port)
+            if server:
+                if ':' in server:
+                    self.server = '[%s]' % server
+                else:
+                    self.server = server
                 return True
-            except socket.error:
-                time.sleep(1)
+            time.sleep(1)
 
         return False
+
+    def  _connect_first_responder(self, port):
+        """Race a connection attempt to the IPv6 address of the metadata
+           service against an attempt to the IPv4 address, "Happy Eyeballs"
+           per RFC 8305. The IPv6 attempt is started first and the IPv4
+           attempt follows if IPv6 has not completed within the connection
+           attempt delay. Return the address of the connection that is
+           established first."""
+        metadata_srv_info = [
+            (socket.AF_INET6, 'fd20:ce::254'),
+            (socket.AF_INET, '169.254.169.254')
+        ]
+        selector = selectors.DefaultSelector()
+        deadline = time.monotonic() + 5 # arbitrary timeout value
+        try:
+            while metadata_srv_info or selector.get_map():
+                timeout = None
+                if metadata_srv_info:
+                    family, addr = metadata_srv_info.pop(0)
+                    sock = self._start_connect(family, addr, port)
+                    if not sock:
+                        # The attempt could not be started, no reason to
+                        # wait before trying the next address
+                        continue
+                    selector.register(sock, selectors.EVENT_WRITE, addr)
+                    timeout = 0.25 # The delay per RFC 8305
+                time_left = deadline - time.monotonic()
+                if time_left <= 0:
+                    return None
+                if timeout is None or timeout > time_left:
+                    timeout = time_left
+                for key, event in selector.select(timeout):
+                    error = key.fileobj.getsockopt(
+                        socket.SOL_SOCKET, socket.SO_ERROR
+                    )
+                    selector.unregister(key.fileobj)
+                    key.fileobj.close()
+                    if not error:
+                        return key.data
+        finally:
+            for key in list(selector.get_map().values()):
+                key.fileobj.close()
+            selector.close()
+
+        return None
+
+    def _start_connect(self, family, addr, port):
+        """Start a non blocking connection attempt, return the socket the
+           attempt is running on or None if it could not be started"""
+        try:
+            sock = socket.socket(family, socket.SOCK_STREAM)
+        except OSError:
+            return None
+        sock.setblocking(False)
+        try:
+            sock.connect((addr, port))
+        except BlockingIOError:
+            pass
+        except OSError:
+            sock.close()
+            return None
+
+        return sock
 
     def _add_arguments(self, option):
         """Add an argument to the uri"""
@@ -164,7 +232,7 @@ class GCEMetadata:
         """Return the value for the requested uri"""
         req = urllib.request.Request(url, headers=self.header)
         try:
-            value = urllib.request.urlopen(req).read()
+            value = urllib.request.urlopen(req, timeout=20).read()
         except:
             return None
 
